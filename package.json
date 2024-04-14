@@ -1,0 +1,35 @@
+{
+  "name": "vue3-core-with-me",
+  "version": "1.0.0",
+  "main": "index.js",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "rollup -c",
+    "build": "node scripts/build.js",
+    "serve": "serve dist"
+  },
+  "repository": "git@github.com:lljl500220/vue3-core-with-me.git",
+  "author": "lljl500220 <1723377108@qq.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-replace": "5.0.4",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@types/node": "^20.12.5",
+    "esbuild": "^0.20.2",
+    "execa": "^8.0.1",
+    "lodash": "^4.17.21",
+    "lodash-es": "^4.17.21",
+    "rollup": "^4.13.2",
+    "rollup-plugin-dts": "^6.1.0",
+    "rollup-plugin-esbuild": "^6.1.1",
+    "rollup-plugin-polyfill-node": "^0.13.0",
+    "serve": "^14.2.1",
+    "typescript": "^5.4.5"
+  }
+}
