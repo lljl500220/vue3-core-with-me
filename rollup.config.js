@@ -1,14 +1,8 @@
-import esbuild from 'rollup-plugin-esbuild' //用于处理ts文件
-import {nodeResolve} from '@rollup/plugin-node-resolve' //用于处理第三方模块
-// import commonjs from '@rollup/plugin-commonjs' //用于处理commonjs模块
-import json from '@rollup/plugin-json' //用于处理json文件
-import {dts} from 'rollup-plugin-dts' //用于生成d.ts文件
-import terser from '@rollup/plugin-terser' //用于压缩代码
-import polyfillNode from 'rollup-plugin-polyfill-node' //用于处理nodejs内置模块
-import { fileURLToPath } from 'node:url' //用于处理文件路径
-import { createRequire } from 'node:module' //用于创建require函数
-import assert from 'node:assert/strict'
-import path from "node:path"; //用于处理文件路径
+import {fileURLToPath} from 'node:url' //用于处理文件路径
+import {createRequire} from 'node:module' //用于创建require函数
+import path from "node:path";
+import json from "@rollup/plugin-json"; //用于处理文件路径
+import esbuild from 'rollup-plugin-esbuild' //用于处理文件路径
 
 /**
  * @template T
@@ -37,67 +31,49 @@ const packageOptions = pkg.buildOptions || {} //获取目标包的构建选项
 const name = packageOptions.filename || path.basename(packageDir) //获取目标包的名称
 
 /** @type {Record<PackageFormat, OutputOptions>} */
-const outputConfigs = { //
+const outputConfigs = {
     'esm-bundler': {
         file: resolve(`dist/${name}.esm-bundler.js`),  //esm-bundler适用于 bundlers（例如 webpack、Rollup）的 ES module 包
         format: 'es',
     },
-    'esm-browser': {
-        file: resolve(`dist/${name}.esm-browser.js`), //浏览器环境下的esm格式
-        format: 'es',
-    },
-    cjs: {
+    'cjs': {
         file: resolve(`dist/${name}.cjs.js`), // commonjs格式
         format: 'cjs',
-    },
-    global: {
-        file: resolve(`dist/${name}.global.js`), //浏览器环境下的全局变量格式
-        format: 'iife',
-    },
-    //仅用于主要的“vue”包 包含了模板编译器 用于运行时
-    'esm-bundler-runtime': {
-        file: resolve(`dist/${name}.runtime.esm-bundler.js`), //bundler环境下的runtime格式
-        format: 'es',
-    },
-    'esm-browser-runtime': {
-        file: resolve(`dist/${name}.runtime.esm-browser.js`), //浏览器环境下的runtime格式
-        format: 'es',
-    },
-    'global-runtime': {
-        file: resolve(`dist/${name}.runtime.global.js`),
-        format: 'iife',
     },
 }
 
 /** @type {ReadonlyArray<PackageFormat>} */
 const defaultFormats = ['esm-bundler', 'cjs'] //默认的打包格式，包含commonjs以及esm
-/** @type {ReadonlyArray<PackageFormat>} */
-const inlineFormats = /** @type {any} */ ( //命令行参数中的打包格式
-    process.env.FORMATS && process.env.FORMATS.split(',')
-)
 
-/** @type {ReadonlyArray<PackageFormat>} */
-const packageFormats = inlineFormats || packageOptions.formats || defaultFormats //打包格式
-const packageConfigs = process.env.PROD_ONLY //是否只打包生产环境
-    ? []
-    : packageFormats.map(format => createConfig(format, outputConfigs[format]))
-
-if (process.env.NODE_ENV === 'production') { //如果是生产环境
-    packageFormats.forEach(format => {
-        if (packageOptions.prod === false) {
-            return
-        }
-        if (format === 'cjs') { //生产环境下的commonjs格式
-            packageConfigs.push(createProductionConfig(format))
-        }
-        if (/^(global|esm-browser)(-runtime)?/.test(format)) { //生产环境下的浏览器环境下的全局变量格式
-            packageConfigs.push(createMinifiedConfig(format))
-        }
-    })
-}
+//此处按照最新的vue打包配置来看，理应先判断是否有inlineFormats，如果有则使用inlineFormats，否则使用defaultFormats
+//打包格式
+//我们只关注生产模式，相当于只打生产包
+const packageConfigs = defaultFormats.map(format => createConfig(format, outputConfigs[format]))
 
 
-function createConfig (format,config) {
+export default packageConfigs
 
+
+function createConfig(format, output, plugins = []) {
+    //返回一个rollup配置对象
+    return {
+        input: resolve('src/index.ts'), //入口文件 我们简易实现，仅保留'src/index.ts'这种情况，事实上还有运行时等其他情况
+        output: output, //输出配置 其实就是outputConfigs[format] vue本身实现了相当多中格式输出，但是我们只保留了两种
+        plugins: [
+            json({
+                namedExports: false
+            }),
+            esbuild({ //处理ts文件
+                tsconfig: path.resolve(__dirname, 'tsconfig.json'),
+                sourceMap: output.sourcemap,
+                minify: false,
+                target: 'es2015',
+                define:{
+                    version: `"${masterVersion}"`
+                }
+            }),
+            ...plugins //其它有可能存在的插件
+        ]
+    }
 }
 
