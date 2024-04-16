@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "rollup -c",
     "build": "node scripts/build.js",
-    "serve": "serve dist"
+    "serve": "serve"
   },
   "repository": "git@github.com:lljl500220/vue3-core-with-me.git",
   "author": "lljl500220 <1723377108@qq.com>",

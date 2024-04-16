@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="app">
+    <button id="">change</button>
+</div>
+<script type="module">
+    import {reactive, effect} from "/packages/reactivity/dist/reactivity.esm-bundler.js";
+
+    const obj = reactive({name: '老罗', age: 18});
+
+    effect(() => {
+        document.querySelector('#app').innerText = `${obj.name}, ${obj.age}`
+    })
+
+    setTimeout(() => {
+        obj.name = '帅比'
+    }, 1000)
+</script>
+</body>
+</html>

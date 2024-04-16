@@ -87,7 +87,7 @@ async function build(target) {
     await execa(
         'rollup',
         [
-            '-cw',
+            '-c',
             '--environment',
             [
                 `NODE_ENV:${env}`,
