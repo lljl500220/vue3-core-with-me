@@ -9,17 +9,21 @@
     <button id="">change</button>
 </div>
 <script type="module">
-    import {reactive, effect} from "/packages/reactivity/dist/reactivity.esm-bundler.js";
+    import {reactive, effect,computed} from "/packages/reactivity/dist/reactivity.esm-bundler.js";
 
     const obj = reactive({name: '老罗', age: 18});
 
+    const realName = computed(() => {
+        return obj.name + '真帅'
+    })
+
     effect(() => {
-        document.querySelector('#app').innerText = `${obj.name}, ${obj.age}`
+        document.querySelector('#app').innerText = `${obj.name}, ${obj.age}, ${realName.value}`
     })
 
     setTimeout(() => {
-        obj.name = '帅比'
-    }, 1000)
+        obj.name = 'luo'
+    }, 2000)
 </script>
 </body>
 </html>

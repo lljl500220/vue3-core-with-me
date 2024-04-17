@@ -2,10 +2,12 @@ let activeEffect: () => void;
 export const effect = (fn: Function) => {
     const _effect = function (){
         activeEffect = _effect
-        fn();
+        return fn()
     }
 
     _effect()
+
+    return _effect
 }
 
 const targetsMap = new WeakMap()
